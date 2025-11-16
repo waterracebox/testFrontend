@@ -6,7 +6,15 @@ export default function App(){
   const wsRef = useRef(null)
 
   useEffect(()=>{
-    const ws = new WebSocket('ws://localhost:3000')
+    // 從 Vite 環境變數讀取後端 WebSocket 位址（build 時注入）
+    // 預設 fallback 為本機的 ws://localhost:3000
+    const envWs = import.meta.env.VITE_BACKEND_WS;
+    const envHost = import.meta.env.VITE_BACKEND_HOST; // 可選：host:port
+    const defaultHost = 'localhost:3000';
+    const proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const wsUrl = envWs || (proto + (envHost || defaultHost));
+
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws
 
     ws.addEventListener('open', ()=>{
